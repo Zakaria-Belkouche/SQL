@@ -179,22 +179,86 @@ ON c.course_ID = s.course_ID
 GROUP BY c.course_name
 ORDER BY student_count DESC;
 
+-- Question 6)
+-- Show the names of all teachers and the total number of modules 
+-- each one teaches, ordered from most to least.
+
+SELECT teacher_name, count(m.module_ID) AS module_count
+FROM teacher AS t
+LEFT JOIN
+modules as m
+ON t.teacher_ID = m.teacher_ID
+GROUP BY teacher_name
+ORDER BY module_count DESC;
+
+-- Question 7)
+-- Show each client’s name along with the academy (company) name they’re associated with.
+
+SELECT c.client_name, a.company_name
+FROM client as c
+INNER JOIN
+academy as a
+ON c.company_ID = a.company_ID;
+
+-- Question 8)
+-- Show the course name, module name, and teacher name 
+-- but only for courses taught by the teacher “Kishore.”
+
+SELECT c.course_name, m.module_name, t.teacher_name
+FROM courses as c
+INNER JOIN 
+modules AS m ON c.course_ID = m.course_ID
+INNER JOIN
+teacher AS t ON t.teacher_ID = m.teacher_ID
+WHERE t.teacher_name = "kishore";
+
+-- Question 9)
+-- Show each academy’s name and the total number of clients they have
+-- including academies with no clients.
+
+SELECT a.company_name, count(c.client_ID) AS client_count
+FROM academy as a
+LEFT JOIN
+client as c ON a.company_ID = c.company_ID
+GROUP BY a.company_ID;
+
+-- Question 10)
+-- Show each course name along with the average age of students enrolled in that course.
+
+SELECT c.course_name, AVG(s.student_age) as average_age
+FROM courses as c
+INNER JOIN
+students as s ON s.course_ID = c.course_ID
+GROUP BY c.course_name;
+
+-- Question 11) 
+-- Create an index on the student_email column in the students table
+-- to speed up queries that search for a student by their email address.
+
+CREATE INDEX idxStudentEmail ON students(student_email);
+SELECT * FROM students WHERE student_email = "zak@email.com";
+
+-- Question 12)
+-- Create a trigger that automatically stores a record in a log table
+-- whenever a new student is added to the students table.
+
+CREATE table student_log(log_ID int AUTO_INCREMENT PRIMARY KEY, 
+								student_name varchar(50), 
+                                action varchar(20),
+                                created_at DATETIME);
+                                
+DELIMITER $$
+CREATE TRIGGER T1 
+AFTER INSERT ON students
+FOR EACH ROW
+BEGIN
+INSERT INTO student_log (student_name, action, created_at) 
+VALUES (NEW.student_name, "INSERT", NOW());
+END$$
+Delimiter ;
+
+INSERT into students VALUES(1234, "amira", "amira@email.com", 21, 10);
+
+SELECT * FROM student_log;                                
 
 
-
-
-
-
-
-
-
-
--- Joins
--- Group by
--- Sub queries
--- Primary key / Foreign key
--- ERD
--- Order by
--- Indexing? 
--- + extra (like windows functions?)
--- Can include triggers
